@@ -1,0 +1,46 @@
+name: coverage
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  collect-coverage:
+    runs-on: ${{ matrix.os }}
+
+    defaults:
+      run:
+        shell: pwsh
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # https://github.com/microsoft/codecoverage/blob/main/docs/supported-os.md
+        # Note: ARM64 on linux/macos are not supported. And it's not works as expected on macos-15-intel.
+        os: [windows-latest, windows-11-arm, ubuntu-latest, macos-15-intel]
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Run dotnet --info
+        run: dotnet --info
+
+      - name: Install dotnet-coverage
+        run: dotnet tool install --global dotnet-coverage
+
+      - name: Start dotnet-coverage with background server mode
+        run: dotnet coverage collect --session-id dummy_session_id --server-mode --background
+
+      # - name: Collect Code Coverage
+      #   run: |
+      #     dotnet coverage connectdummy_session_id "dotnet test -c Release --no-build --framework net8.0"
+
+      - name: Shutdown dotnet-coverage server.
+        run: dotnet coverage shutdown dummy_session_id
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: coverage-${{ matrix.os }}
+          path: "**/*.cobertura.xml"
+
