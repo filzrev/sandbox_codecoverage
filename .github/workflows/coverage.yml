@@ -29,7 +29,7 @@ jobs:
         run: dotnet tool install --global dotnet-coverage
 
       - name: Start dotnet-coverage with background server mode
-        run: dotnet coverage collect --session-id dummy_session_id
+        run: dotnet coverage collect --session-id dummy_session_id --server-mode --background
 
       # - name: Collect Code Coverage
       #   run: |
