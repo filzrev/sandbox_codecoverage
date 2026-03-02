@@ -28,7 +28,10 @@ jobs:
             10.x
             9.x
             8.x
-
+            
+      - name: Run vm_stat
+        run: vm_stat
+        
       - name: Run dotnet --info
         run: dotnet --info
 
